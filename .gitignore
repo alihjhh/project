@@ -1,3 +1,4 @@
 doc/*
 .vscode/*
 *.ui
+__pycache__/*
