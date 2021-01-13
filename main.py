@@ -1,11 +1,20 @@
 from ui import Ui_MainWindow
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QFileDialog
+
 
 class Ui(Ui_MainWindow):
 
-    def test(self):
-        pass
+    def setupUi(self, MainWindow):
+        super().setupUi(MainWindow)
+        self.setDataPath_btn.clicked.connect(self.setDataDir)
 
+    def setDataDir(self):
+        self.dataDir = str(QFileDialog.getExistingDirectory(None, "Select Directory"))
+        self.label.setText("Data Path : "+ self.dataDir)
+
+    def faz_one(self):
+        pass
 
 
 
