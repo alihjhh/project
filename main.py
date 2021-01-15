@@ -61,7 +61,6 @@ class Ui(Ui_MainWindow):
         workersFamilyList = list(item for item in workersFamilyList)
         workersFamilyList.extend(workerList)
         ssnList = list(set(workersFamilyList))
-        del workersFamilyList
         import datetime
         date = datetime.datetime.now().date() - datetime.timedelta(days=2*365)
         date = str(date)
