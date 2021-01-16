@@ -19,6 +19,7 @@ class Ui(Ui_MainWindow):
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.faz2_btn.clicked.connect(self.faz_two)
         self.faz3_btn.clicked.connect(self.faz_three)
+        self.faz4_btn.clicked.connect(self.faz_four)
 
     def setDataDir(self):
         self.dataDir = str(QFileDialog.getExistingDirectory(
@@ -135,6 +136,40 @@ class Ui(Ui_MainWindow):
         df.to_csv(os.path.join(self.dataDir, 'faz3.csv'), columns=['first_name','last_name','ssn','birthday','city','work'], index=False)
         self.comboBox.addItem('faz3.csv')
         self.comboBox.setCurrentText('faz3.csv')
+
+    def faz_four(self):
+        df = pd.read_csv(os.path.join(self.dataDir, 'people.csv'))
+        df = df.loc[df["work"] == "قاچاقچی"]["ssn"]
+        temp = list(item for item in df)
+        df = pd.read_csv(os.path.join(self.dataDir, 'phones.csv'))
+        df = df.loc[df["ssn"].isin(temp)]["number"]
+        ghachaghchiPhone = list(item for item in df)
+        df = pd.read_csv(os.path.join(self.dataDir, 'faz3.csv'))["ssn"]
+        temp = list(item for item in df)
+        df = pd.read_csv(os.path.join(self.dataDir, 'phones.csv'))
+        df = df.loc[df["ssn"].isin(temp)]["number"]
+        susPhone = list(item for item in df)
+        df = pd.read_csv(os.path.join(self.dataDir, 'calls.csv'))
+        dfTemp1 = df.loc[(df["from"].isin(ghachaghchiPhone)) & (df["to"].isin(susPhone))]["to"]
+        dfTemp2 = df.loc[(df["from"].isin(susPhone)) & (df["to"].isin(ghachaghchiPhone))]["from"]
+        df1 = list(item for item in dfTemp1)
+        df2 = list(item for item in dfTemp2)
+        df1 = list(set(df1))
+        df2 = list(set(df2))
+        df1.extend(df2)
+        result = []
+        for item in df1:
+            if item in susPhone:
+                result.append(item)
+        df = pd.read_csv(os.path.join(self.dataDir, 'phones.csv'))
+        df = df.loc[df["number"].isin(result)]["ssn"]
+        df = list(item for item in df)
+        resSSN = list(set(df))
+        df = pd.read_csv(os.path.join(self.dataDir, 'people.csv'))
+        df = df.loc[df["ssn"].isin(resSSN)]
+        df.to_csv(os.path.join(self.dataDir, 'faz4.csv'), columns=['first_name','last_name','ssn','birthday','city','work'], index=False)
+        self.comboBox.addItem('faz4.csv')
+        self.comboBox.setCurrentText('faz4.csv')
 
 
 
