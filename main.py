@@ -18,6 +18,7 @@ class Ui(Ui_MainWindow):
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.faz2_btn.clicked.connect(self.faz_two)
+        self.faz3_btn.clicked.connect(self.faz_three)
 
     def setDataDir(self):
         self.dataDir = str(QFileDialog.getExistingDirectory(
@@ -85,6 +86,57 @@ class Ui(Ui_MainWindow):
         resultData.to_csv(os.path.join(self.dataDir, 'faz2.csv'), columns=['first_name','last_name','ssn','birthday','city','work'], index=False)
         self.comboBox.addItem('faz2.csv')
         self.comboBox.setCurrentText('faz2.csv')
+
+    def faz_three(self):
+        result = []
+        df = pd.read_csv(os.path.join(self.dataDir, 'people.csv'))
+        df = df.loc[df["work"] == "قاچاقچی"]["ssn"]
+        temp = list(item for item in df)
+        del df
+        dfacc = pd.read_csv(os.path.join(self.dataDir, 'accounts.csv'))
+        ghachaghchiAcc = dfacc.loc[dfacc["ssn"].isin(temp)]["account_id"]
+        del temp
+        ghachaghchiAcc = list(item for item in ghachaghchiAcc)
+        df = pd.read_csv(os.path.join(self.dataDir, 'faz2.csv'))["ssn"]
+        temp = list(item for item in df)
+        del df
+        susAcc = dfacc.loc[dfacc["ssn"].isin(temp)]["account_id"]
+        del temp
+        del dfacc
+        susAcc = list(item for item in susAcc)
+        dfTemp = pd.read_csv(os.path.join(self.dataDir, 'transactions.csv'))
+        df = dfTemp.loc[dfTemp["to"].isin(susAcc)]
+        del dfTemp
+        lvl1 = df.loc[df["from"].isin(ghachaghchiAcc)]["to"]
+        lvl1 = list(item for item in lvl1)
+        lvl1 = list(set(lvl1))
+        result.extend(lvl1)
+        df = df.loc[df["to"].isin(lvl1) == False]
+        dfTransactoin = pd.read_csv(os.path.join(self.dataDir, 'transactions.csv'))
+        df = df.reset_index(drop=True)
+
+        for i in range(df.shape[0]):
+            temp = df.loc[i][1]
+            temp2 = [df.loc[i][0]]
+            for i in range(5):
+                dfTemp = dfTransactoin.loc[dfTransactoin["to"].isin(temp2)]
+                dfTemp2 = dfTemp.loc[dfTemp["from"].isin(ghachaghchiAcc)]
+                if(dfTemp2.shape[0] > 0):
+                    result.append(temp)
+                    break
+                else:
+                    temp2 = dfTransactoin.loc[dfTransactoin["to"].isin(temp2)]["from"]
+                    temp2 = list(item for item in temp2)
+        result = list(set(result))
+        df = pd.read_csv(os.path.join(self.dataDir, 'accounts.csv'))
+        temp = df.loc[df["account_id"].isin(result)]["ssn"]
+        df = pd.read_csv(os.path.join(self.dataDir, 'people.csv'))
+        df = df.loc[df["ssn"].isin(temp)]
+        df.to_csv(os.path.join(self.dataDir, 'faz3.csv'), columns=['first_name','last_name','ssn','birthday','city','work'], index=False)
+        self.comboBox.addItem('faz3.csv')
+        self.comboBox.setCurrentText('faz3.csv')
+
+
 
 
 

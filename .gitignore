@@ -3,3 +3,6 @@ doc/*
 *.ui
 __pycache__/*
 data/faz2.csv
+data/faz3.csv
+data/faz4.csv
+test.py
